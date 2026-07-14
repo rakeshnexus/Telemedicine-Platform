@@ -1,0 +1,10 @@
+node_modules
+client/node_modules
+.vscode
+.github
+tests
+*.bat
+*.sh
+.railwayignore
+docker-compose.yml
+nginx.conf

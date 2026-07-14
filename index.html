@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title> Telemedicine Platform</title>
+  <!-- Google Fonts for premium typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap"
+    rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Custom Style Sheet -->
+  <link rel="stylesheet" href="/public/css/style.css">
+</head>
+
+<body class="light-mode">
+
+  <!-- Accessibility Toolbar -->
+  <div class="accessibility-bar" id="accessibilityBar">
+    <div class="accessibility-container">
+      <div class="acc-brand">
+        <i class="fa-solid fa-hand-holding-medical"></i>
+        <span>Accessibility Support:</span>
+      </div>
+      <div class="acc-toggles">
+        <button id="toggleContrast" class="acc-btn" title="High Contrast Mode">
+          <i class="fa-solid fa-circle-half-stroke"></i> High Contrast
+        </button>
+        <button id="toggleBandwidth" class="acc-btn" title="Low Bandwidth Mode">
+          <i class="fa-solid fa-gauge-simple-high"></i> Low-Bandwidth Mode
+        </button>
+        <div class="language-selector">
+          <i class="fa-solid fa-language"></i>
+          <select id="langSelector">
+            <option value="en">English (Default)</option>
+            <option value="hi">हिन्दी (Hindi)</option>
+            <option value="ta">தமிழ் (Tamil)</option>
+            <option value="te">తెలుగు (Telugu)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Navigation Header -->
+  <header class="main-header">
+    <div class="header-container">
+      <div class="logo-area" onclick="location.reload()">
+        <div class="logo-icon">
+          <i class="fa-solid fa-heart-pulse"></i>
+        </div>
+        <div class="logo-text">
+          <h1>RuralCare <span>Connect</span></h1>
+          <p>Telehealth for Remote & Rural India</p>
+        </div>
+      </div>
+      <div class="header-right-widgets">
+        <div class="compliance-badge" title="HIPAA & DISHA Secure (AES-256 E2E Encryption)">
+          <i class="fa-solid fa-shield-halved text-teal"></i>
+          <span>HIPAA & DISHA Secure</span>
+        </div>
+        <div class="connection-status" id="connectionStatus">
+          <span class="status-indicator offline"></span>
+          <span class="status-text">Disconnected</span>
+        </div>
+      </div>
+      <div class="user-profile-menu" id="userProfileMenu" style="display: none;">
+        <span id="headerUserName" class="user-name-label">Loading User...</span>
+        <span id="headerUserRole" class="badge-role">Patient</span>
+        <button id="logoutBtn" class="logout-btn">
+          <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Notification Bar -->
+  <div id="toastNotification" class="toast-container" style="display: none;">
+    <div class="toast-content">
+      <i class="fa-solid fa-bell toast-icon"></i>
+      <div class="toast-text">
+        <p id="toastMessage">Appointment scheduled successfully!</p>
+        <small id="toastTime">Just now</small>
+      </div>
+      <button class="toast-close" onclick="document.getElementById('toastNotification').style.display='none'">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Container -->
+  <main class="app-main-container">
+
+    <!-- 1. AUTH SECTION -->
+    <section id="authSection" class="auth-section">
+      <div class="auth-grid-container">
+
+        <!-- Platform Mission Info Column -->
+        <div class="mission-info-column">
+          <div class="mission-header">
+            <span class="mission-badge"><i class="fa-solid fa-hospital-user"></i> Trusted E-Health Initiative</span>
+            <h2>Bridging the Healthcare Gap for Remote Regions</h2>
+            <p>RuralCare Connect is built to provide remote regions with immediate clinical access, bypassing high
+              expenses, long queues, and geographical boundaries.</p>
+          </div>
+
+          <div class="problems-solutions-list">
+            <div class="ps-item">
+              <div class="ps-icon"><i class="fa-solid fa-map-location-dot"></i></div>
+              <div class="ps-text">
+                <h4>Lack of Access in Rural Areas</h4>
+                <p>Brings certified urban doctors directly to village centers via government-integrated telemedicine
+                  hubs.</p>
+              </div>
+            </div>
+            <div class="ps-item">
+              <div class="ps-icon"><i class="fa-solid fa-hourglass-half"></i></div>
+              <div class="ps-text">
+                <h4>Long Hospital Waiting Times</h4>
+                <p>Instantly book specific slots without waiting for hours in crowded physical outpatient clinics.</p>
+              </div>
+            </div>
+            <div class="ps-item">
+              <div class="ps-icon"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+              <div class="ps-text">
+                <h4>High Travel & Consultation Costs</h4>
+                <p>Consult online from home. All appointments are covered under government sponsorship or structured
+                  micro-fees.</p>
+              </div>
+            </div>
+            <div class="ps-item">
+              <div class="ps-icon"><i class="fa-solid fa-user-doctor"></i></div>
+              <div class="ps-text">
+                <h4>Difficulty Accessing Specialists</h4>
+                <p>Direct consults with verified Pediatricians, Cardiologists, and Gynaecologists via virtual specialist
+                  clinics.</p>
+              </div>
+            </div>
+            <div class="ps-item">
+              <div class="ps-icon"><i class="fa-solid fa-folder-open"></i></div>
+              <div class="ps-text">
+                <h4>Poor Records Management</h4>
+                <p>Your secure Electronic Health Record (EHR) folder saves medical histories offline directly in your
+                  browser.</p>
+              </div>
+            </div>
+            <div class="ps-item">
+              <div class="ps-icon"><i class="fa-solid fa-shield-halved"></i></div>
+              <div class="ps-text">
+                <h4>Insecure Online Communications</h4>
+                <p>Peer-to-peer WebRTC signaling and encrypted real-time messages keep your diagnoses confidential.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="auth-card">
+          <div class="auth-tabs">
+            <button class="auth-tab-btn active" data-tab="login">Login</button>
+            <button class="auth-tab-btn" data-tab="register">Register</button>
+          </div>
+
+          <!-- LOGIN FORM -->
+          <div id="loginTabContent" class="tab-content active">
+            <h2 class="form-title">Welcome Back</h2>
+            <p class="form-subtitle">Access your healthcare dashboard</p>
+            <form id="loginForm" class="auth-form">
+              <div class="input-group">
+                <label for="loginUsername"><i class="fa-solid fa-user"></i> Username</label>
+                <input type="text" id="loginUsername" required placeholder="e.g. patient1, doctor1">
+              </div>
+              <div class="input-group">
+                <label for="loginPassword"><i class="fa-solid fa-lock"></i> Password</label>
+                <input type="password" id="loginPassword" required placeholder="••••••••">
+              </div>
+              <button type="submit" class="btn btn-primary btn-block">Log In</button>
+            </form>
+            <div class="demo-logins">
+              <p><i class="fa-solid fa-circle-info"></i> Demo accounts (Password: <code>password</code>):</p>
+              <div class="demo-buttons">
+                <button onclick="fillDemoLogin('patient1')" type="button" class="demo-tag">Patient (Ramesh)</button>
+                <button onclick="fillDemoLogin('patient2')" type="button" class="demo-tag">Patient (Savita)</button>
+                <button onclick="fillDemoLogin('doctor1')" type="button" class="demo-tag">Doctor (Dr. Anjali)</button>
+                <button onclick="fillDemoLogin('doctor2')" type="button" class="demo-tag">Doctor (Dr. Vikram)</button>
+                <button onclick="fillDemoLogin('admin1')" type="button" class="demo-tag">Admin</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- REGISTER FORM -->
+          <div id="registerTabContent" class="tab-content">
+            <h2 class="form-title">Join Our Platform</h2>
+            <p class="form-subtitle">Register to connect with medical experts</p>
+
+            <div class="role-selector-wrapper">
+              <label>I am a:</label>
+              <div class="role-cards">
+                <label class="role-card-label selected">
+                  <input type="radio" name="registerRole" value="patient" checked>
+                  <div class="role-card-content">
+                    <i class="fa-solid fa-user-injured"></i>
+                    <span>Patient</span>
+                  </div>
+                </label>
+                <label class="role-card-label">
+                  <input type="radio" name="registerRole" value="doctor">
+                  <div class="role-card-content">
+                    <i class="fa-solid fa-user-md"></i>
+                    <span>Doctor</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <form id="registerForm" class="auth-form">
+              <div class="form-grid">
+                <div class="input-group">
+                  <label for="regUsername"><i class="fa-solid fa-id-card"></i> Choose Username</label>
+                  <input type="text" id="regUsername" required placeholder="e.g. mohan_p">
+                </div>
+                <div class="input-group">
+                  <label for="regPassword"><i class="fa-solid fa-lock"></i> Password</label>
+                  <input type="password" id="regPassword" required placeholder="Min 6 characters">
+                </div>
+                <div class="input-group col-span-2">
+                  <label for="regFullName"><i class="fa-solid fa-user"></i> Full Name</label>
+                  <input type="text" id="regFullName" required placeholder="e.g. Mohan Prasad">
+                </div>
+                <div class="input-group">
+                  <label for="regPhone"><i class="fa-solid fa-phone"></i> Phone Number</label>
+                  <input type="tel" id="regPhone" required placeholder="e.g. +91 XXXXX XXXXX">
+                </div>
+                <div class="input-group">
+                  <label for="regLocation"><i class="fa-solid fa-location-dot"></i> Village/District Name</label>
+                  <input type="text" id="regLocation" required placeholder="e.g. Salem Village, Tamil Nadu">
+                </div>
+
+                <!-- Patient Specific Fields -->
+                <div class="patient-fields form-grid col-span-2">
+                  <div class="input-group">
+                    <label for="regAge">Age</label>
+                    <input type="number" id="regAge" placeholder="e.g. 28">
+                  </div>
+                  <div class="input-group">
+                    <label for="regGender">Gender</label>
+                    <select id="regGender">
+                      <option value="">Select</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                  <div class="input-group">
+                    <label for="regBloodGroup">Blood Group</label>
+                    <input type="text" id="regBloodGroup" placeholder="e.g. B+">
+                  </div>
+                </div>
+
+                <!-- Doctor Specific Fields -->
+                <div class="doctor-fields form-grid col-span-2" style="display: none;">
+                  <div class="input-group">
+                    <label for="regSpecialty">Specialty</label>
+                    <select id="regSpecialty">
+                      <option value="General Physician">General Physician</option>
+                      <option value="Pediatrician">Pediatrician</option>
+                      <option value="Cardiologist">Cardiologist</option>
+                      <option value="Gynaecologist">Gynaecologist</option>
+                      <option value="Dermatologist">Dermatologist</option>
+                    </select>
+                  </div>
+                  <div class="input-group">
+                    <label for="regLicense">Medical Registration Number</label>
+                    <input type="text" id="regLicense" placeholder="e.g. REG-YYYY-XXXX">
+                  </div>
+                  <div class="input-group col-span-2">
+                    <label for="regRate">Consultation Fee</label>
+                    <input type="text" id="regRate" placeholder="e.g. Free (Govt Hub) or ₹200">
+                  </div>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-block btn-register">Create Account</button>
+            </form>
+          </div> <!-- End of auth-card -->
+        </div> <!-- End of auth-grid-container -->
+    </section>
+
+    <!-- 2. PATIENT DASHBOARD -->
+    <section id="patientDashboard" class="dashboard-section" style="display: none;">
+      <div class="dashboard-header">
+        <div class="welcome-box">
+          <h2>Namaste, <span id="patientNameDisplay">Patient</span>!</h2>
+          <p class="rural-tagline"><i class="fa-solid fa-map-location-dot"></i> Logged in from: <strong
+              id="patientLocationDisplay">Dharmapuri</strong></p>
+        </div>
+        <div class="quick-status-cards">
+          <div class="q-card">
+            <i class="fa-solid fa-file-medical text-teal"></i>
+            <div>
+              <h4 id="patientEhrCount">0</h4>
+              <p>Medical Records</p>
+            </div>
+          </div>
+          <div class="q-card">
+            <i class="fa-solid fa-prescription-bottle-medical text-green"></i>
+            <div>
+              <h4 id="patientPresCount">0</h4>
+              <p>Prescriptions</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <!-- LEFT PANEL: Triage & Booking -->
+        <div class="dashboard-panel panel-left">
+
+          <!-- Symptom Checker Triage -->
+          <div class="widget triage-widget">
+            <h3><i class="fa-solid fa-file-waveform"></i> Smart Symptom Triage</h3>
+            <p class="triage-intro">Select your main symptom to find the right health expert immediately.</p>
+            <div class="symptom-tags">
+              <button class="symptom-btn" data-specialty="General Physician"><i class="fa-solid fa-head-side-cough"></i>
+                Cough & Fever</button>
+              <button class="symptom-btn" data-specialty="Pediatrician"><i class="fa-solid fa-child"></i> Child's
+                Illness</button>
+              <button class="symptom-btn" data-specialty="Cardiologist"><i class="fa-solid fa-heart-crack"></i> Chest
+                Tightness</button>
+              <button class="symptom-btn" data-specialty="Gynaecologist"><i class="fa-solid fa-person-pregnant"></i>
+                Pregnancy Care</button>
+            </div>
+            <div id="triageRecommendation" class="triage-recommendation" style="display: none;">
+              <p><i class="fa-solid fa-circle-check text-green"></i> Recommended Specialty: <strong
+                  id="triageSpecialty">General Physician</strong></p>
+              <button class="btn btn-outline btn-xs" id="applyTriageSearch">Search Doctors Now</button>
+            </div>
+          </div>
+
+          <!-- Doctor Search & Booking -->
+          <div class="widget search-doctors-widget">
+            <h3><i class="fa-solid fa-user-doctor"></i> Find Available Doctors</h3>
+            <div class="search-bar">
+              <input type="text" id="doctorSearchInput" placeholder="Search by name or specialty...">
+              <select id="specialtyFilter">
+                <option value="all">All Specialties</option>
+                <option value="General Physician">General Physician</option>
+                <option value="Pediatrician">Pediatrician</option>
+                <option value="Cardiologist">Cardiologist</option>
+                <option value="Gynaecologist">Gynaecologist</option>
+              </select>
+            </div>
+
+            <!-- Doctor Search Results list -->
+            <div class="doctors-list" id="doctorsListContainer">
+              <!-- Rendered Dynamically -->
+              <p class="loading-placeholder">Loading doctors...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT PANEL: Appointments & Records -->
+        <div class="dashboard-panel panel-right">
+
+          <!-- Appointments Queue -->
+          <div class="widget appointments-widget">
+            <h3><i class="fa-solid fa-calendar-check"></i> My Consultations</h3>
+            <div class="appointment-list" id="patientAppointmentsContainer">
+              <!-- Rendered Dynamically -->
+              <p class="empty-placeholder">No appointments booked yet.</p>
+            </div>
+          </div>
+
+          <!-- EHR Upload & View -->
+          <div class="widget ehr-widget">
+            <h3><i class="fa-solid fa-folder-medical"></i> Health Records (EHR)</h3>
+            <form id="ehrUploadForm" class="ehr-upload-form">
+              <div class="form-row">
+                <input type="text" id="ehrTitle" placeholder="Record Title (e.g. Lab Report)" required>
+                <select id="ehrCategory">
+                  <option value="Lab Report">Lab Report</option>
+                  <option value="Prescription Scan">Prescription Scan</option>
+                  <option value="Discharge Summary">Discharge Summary</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div class="form-row">
+                <input type="file" id="ehrFile" accept="image/*,application/pdf" required class="file-input">
+                <button type="submit" class="btn btn-teal"><i class="fa-solid fa-upload"></i> Upload</button>
+              </div>
+              <small class="low-bandwidth-alert"><i class="fa-solid fa-cloud-arrow-up"></i> Files are compressed
+                automatically in low-bandwidth mode.</small>
+            </form>
+            <div class="ehr-list" id="patientEhrListContainer">
+              <!-- Rendered Dynamically -->
+            </div>
+          </div>
+
+          <!-- Prescription Cards -->
+          <div class="widget prescriptions-widget">
+            <h3><i class="fa-solid fa-notes-medical"></i> Digital Prescriptions</h3>
+            <div class="prescriptions-list" id="patientPrescriptionListContainer">
+              <!-- Rendered Dynamically -->
+              <p class="empty-placeholder">No digital prescriptions issued yet.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. DOCTOR DASHBOARD -->
+    <section id="doctorDashboard" class="dashboard-section" style="display: none;">
+      <div class="dashboard-header">
+        <div class="welcome-box">
+          <h2>Welcome, <span id="doctorNameDisplay">Dr. Menon</span>!</h2>
+          <p class="rural-tagline">
+            <i class="fa-solid fa-user-shield text-green"></i> Specialty: <strong id="doctorSpecialtyDisplay">General
+              Physician</strong> |
+            <span id="doctorVerificationBadge" class="badge-role">Unverified</span>
+          </p>
+        </div>
+        <div class="quick-status-cards">
+          <!-- Availability Toggle -->
+          <div class="doctor-presence-toggle">
+            <span>Presence Status:</span>
+            <label class="switch">
+              <input type="checkbox" id="doctorPresenceSwitch" checked>
+              <span class="slider round"></span>
+            </label>
+            <strong id="doctorPresenceLabel" class="presence-online">ONLINE</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <!-- LEFT PANEL: Consultation Room List & Queue -->
+        <div class="dashboard-panel panel-left">
+          <div class="widget doctor-queue-widget">
+            <h3><i class="fa-solid fa-clock-rotate-left"></i> Consultation Requests</h3>
+            <div class="appointment-list" id="doctorAppointmentsContainer">
+              <!-- Rendered Dynamically -->
+              <p class="empty-placeholder">No consultation requests available.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT PANEL: EHR Lookups -->
+        <div class="dashboard-panel panel-right">
+          <div class="widget doctor-search-patient-ehr">
+            <h3><i class="fa-solid fa-magnifying-glass-pulse"></i> Patient EHR Directory</h3>
+
+            <!-- Privacy Compliance Notice -->
+            <div class="privacy-compliance-info-box"
+              style="background-color: #f0fdfa; border: 1px solid #ccfbf1; padding: 10px; border-radius: var(--radius-sm); margin-bottom: 12px; font-size: 11px; display: flex; gap: 8px; align-items: flex-start;">
+              <i class="fa-solid fa-user-shield text-teal" style="font-size: 16px; margin-top: 2px;"></i>
+              <div>
+                <strong style="color: var(--primary);">Secure Patient Privacy Channel</strong>
+                <p style="color: var(--text-muted); font-size: 10.5px; line-height: 1.3;">In compliance with HIPAA &
+                  DISHA rules, every access to patient EHR is restricted to authorized physicians and recorded in the
+                  audit log.</p>
+              </div>
+            </div>
+
+            <div class="patient-lookup-bar">
+              <select id="doctorPatientLookupSelect">
+                <option value="">Select a patient to view files...</option>
+                <!-- Rendered dynamically -->
+              </select>
+              <button id="lookupPatientEhrBtn" class="btn btn-teal btn-sm">Load EHR</button>
+            </div>
+            <div id="doctorPatientEhrResult" class="ehr-list" style="margin-top: 15px;">
+              <p class="empty-placeholder">Select a patient above to review their uploaded health records.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. ADMIN DASHBOARD -->
+    <section id="adminDashboard" class="dashboard-section" style="display: none;">
+      <div class="dashboard-header">
+        <div class="welcome-box">
+          <h2>Admin Control Hub</h2>
+          <p class="rural-tagline"><i class="fa-solid fa-shield-halved"></i> Global platform monitoring & doctor
+            verification</p>
+        </div>
+      </div>
+
+      <!-- Stats Counters Grid -->
+      <div class="admin-stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon bg-light-blue"><i class="fa-solid fa-user-injured text-blue"></i></div>
+          <div class="stat-info">
+            <h3 id="adminStatPatients">0</h3>
+            <p>Total Patients</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon bg-light-green"><i class="fa-solid fa-user-md text-green"></i></div>
+          <div class="stat-info">
+            <h3 id="adminStatDoctors">0</h3>
+            <p>Total Doctors</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon bg-light-orange"><i class="fa-solid fa-hospital-user text-orange"></i></div>
+          <div class="stat-info">
+            <h3 id="adminStatConsultations">0</h3>
+            <p>Appointments</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon bg-light-teal"><i class="fa-solid fa-seedling text-teal"></i></div>
+          <div class="stat-info">
+            <h3 id="adminStatRural">0</h3>
+            <p>Rural Users Covered</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <!-- Verification Panel -->
+        <div class="dashboard-panel panel-left">
+          <div class="widget admin-verification-widget">
+            <h3><i class="fa-solid fa-user-check"></i> Doctor Onboarding Approvals</h3>
+            <p class="widget-subtitle">Verify licenses and approve physicians to consult on the platform.</p>
+            <div class="doctors-list admin-verification-list" id="adminVerificationContainer">
+
+              <!-- Rendered Dynamically -->
+              <p class="empty-placeholder">No pending verification approvals.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Audit Log Panel -->
+        <div class="dashboard-panel panel-right">
+          <div class="widget admin-logs-widget">
+            <h3><i class="fa-solid fa-list-check"></i> Real-time Platform Audit Logs</h3>
+            <div class="audit-logs-container" id="adminLogsContainer">
+              <!-- Rendered Dynamically -->
+              <p class="empty-placeholder">No audit logs found.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= MODALS & OVERLAYS ================= -->
+
+  <!-- A. APPOINTMENT BOOKING MODAL -->
+  <div class="modal-overlay" id="bookingModal" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Book Tele-Consultation</h3>
+        <button class="modal-close" onclick="closeBookingModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="doctor-mini-profile" id="modalDocProfile">
+          <!-- Loaded dynamically -->
+        </div>
+        <form id="bookingForm" class="modal-form">
+          <input type="hidden" id="bookingDocUsername">
+          <input type="hidden" id="bookingDocName">
+
+          <div class="form-row">
+            <div class="input-group">
+              <label for="bookingDate"><i class="fa-solid fa-calendar"></i> Select Date</label>
+              <input type="date" id="bookingDate" required>
+            </div>
+            <div class="input-group">
+              <label for="bookingTime"><i class="fa-solid fa-clock"></i> Select Time Slot</label>
+              <select id="bookingTime" required>
+                <option value="09:00 AM">09:00 AM</option>
+                <option value="10:00 AM">10:00 AM</option>
+                <option value="11:00 AM">11:00 AM</option>
+                <option value="02:00 PM">02:00 PM</option>
+                <option value="03:00 PM">03:00 PM</option>
+                <option value="04:00 PM">04:00 PM</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label for="bookingNotes"><i class="fa-solid fa-notes-medical"></i> Symptoms / Health Notes</label>
+            <textarea id="bookingNotes" rows="3"
+              placeholder="Tell the doctor how you are feeling (e.g. fever for 2 days, headache)"></textarea>
+          </div>
+
+          <div class="bandwidth-setting-box">
+            <div class="flex-between">
+              <span class="setting-title"><i class="fa-solid fa-network-wired"></i> Bandwidth Setting</span>
+              <span class="setting-badge" id="bookingBandwidthBadge">Standard Quality</span>
+            </div>
+            <p class="setting-desc">Low bandwidth drops video to conserve internet usage and speed up connection in
+              rural regions.</p>
+            <div class="bandwidth-radios">
+              <label>
+                <input type="radio" name="bookingBandwidth" value="standard" checked> Standard (Video + Audio)
+              </label>
+              <label>
+                <input type="radio" name="bookingBandwidth" value="low"> Low Bandwidth (Audio + Chat only)
+              </label>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block">Confirm Appointment Request</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- B. PAYMENT CHECKOUT MODAL -->
+  <div class="modal-overlay" id="paymentModal" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Secure Consultation Payment</h3>
+        <button class="modal-close" onclick="closePaymentModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="payment-summary">
+          <p>Appointment ID: <strong id="payApptId">appt-123</strong></p>
+          <p>Consulting Doctor: <strong id="payDocName">Dr. Vikram Patel</strong></p>
+          <div class="pay-amount-row">
+            <span>Amount Due:</span>
+            <span id="payAmount" class="pay-amt">₹200</span>
+          </div>
+        </div>
+
+        <form id="paymentForm" class="modal-form">
+          <input type="hidden" id="payPaymentId">
+
+          <label class="section-sub">Choose Payment Method:</label>
+          <div class="payment-method-selector">
+            <label class="pay-method-option selected">
+              <input type="radio" name="payMethod" value="Govt Sponsorship Scheme" checked>
+              <div class="pay-option-content">
+                <i class="fa-solid fa-handshake-angle text-teal"></i>
+                <div>
+                  <strong>Govt Health Scheme (Free)</strong>
+                  <p>Ayushman Bharat / State Rural Benefit</p>
+                </div>
+              </div>
+            </label>
+            <label class="pay-method-option">
+              <input type="radio" name="payMethod" value="Mobile Money (M-Pesa/USSD)">
+              <div class="pay-option-content">
+                <i class="fa-solid fa-mobile-screen-button text-blue"></i>
+                <div>
+                  <strong>Mobile Money / USSD Code</strong>
+                  <p>Pay via dial code code instructions</p>
+                </div>
+              </div>
+            </label>
+            <label class="pay-method-option">
+              <input type="radio" name="payMethod" value="Credit/Debit Card">
+              <div class="pay-option-content">
+                <i class="fa-solid fa-credit-card text-orange"></i>
+                <div>
+                  <strong>Credit / Debit / UPI Card</strong>
+                  <p>Standard payment portal simulation</p>
+                </div>
+              </div>
+            </label>
+          </div>
+
+          <!-- Dynamic Method Info Cards -->
+          <div id="govPaymentInfo" class="pay-info-panel">
+            <p><i class="fa-solid fa-circle-check text-green"></i> <strong>Govt Rural Sponsorship Scheme
+                selected.</strong> Verification will happen automatically. No charges apply.</p>
+          </div>
+
+          <div id="ussdPaymentInfo" class="pay-info-panel" style="display: none;">
+            <p><strong>Mobile Money / USSD Payment Guide:</strong></p>
+            <ol class="ussd-list">
+              <li>Dial <code>*141*12#</code> on your standard feature phone.</li>
+              <li>Enter Reference Code: <code id="ussdRef">RC-8812</code></li>
+              <li>Approve payment of amount shown.</li>
+              <li>Wait 10 seconds and click the "Verify Mobile Payment" button below.</li>
+            </ol>
+          </div>
+
+          <div id="cardPaymentInfo" class="pay-info-panel" style="display: none;">
+            <div class="input-group">
+              <label>Card Number</label>
+              <input type="text" placeholder="1111 2222 3333 4444" class="input-sm">
+            </div>
+            <div class="form-row">
+              <div class="input-group">
+                <label>Expiry</label>
+                <input type="text" placeholder="MM/YY" class="input-sm">
+              </div>
+              <div class="input-group">
+                <label>CVV</label>
+                <input type="password" placeholder="***" class="input-sm">
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-teal btn-block" style="margin-top: 15px;">Complete & Authorize
+            Payment</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- C. PRESCRIPTION VIEWER & READER MODAL -->
+  <div class="modal-overlay" id="prescriptionViewModal" style="display: none;">
+    <div class="modal-card prescription-card-modal">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-file-prescription text-teal"></i> Digital Prescription Record</h3>
+        <button class="modal-close" onclick="closePrescriptionModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body" id="prescriptionPrintableContent">
+        <!-- Prescription Card rendering -->
+        <div class="pres-header">
+          <div class="pres-hospital">
+            <h4>RURALCARE CONNECT HUB</h4>
+            <p>State E-Health Initiative</p>
+          </div>
+          <div class="pres-meta-info text-right">
+            <p><strong>Prescription ID:</strong> <span id="presModalId">pres-88</span></p>
+            <p><strong>Date:</strong> <span id="presModalDate">2026-06-15</span></p>
+          </div>
+        </div>
+
+        <hr class="pres-divider">
+
+        <div class="pres-users-info">
+          <div>
+            <p class="label-muted">PATIENT PROFILE</p>
+            <h5 id="presModalPatientName">Ramesh Kumar</h5>
+            <p>Age/Gender: <span id="presModalPatientMeta">45, Male</span></p>
+          </div>
+          <div class="text-right">
+            <p class="label-muted">CONSULTING DOCTOR</p>
+            <h5 id="presModalDocName">Dr. Anjali Menon</h5>
+            <p>Reg No: <span id="presModalDocReg">REG-2023-8821</span></p>
+          </div>
+        </div>
+
+        <div class="pres-body">
+          <div class="diagnosis-block">
+            <strong>Diagnosis / Clinical Assessment:</strong>
+            <p id="presModalDiagnosis" class="pres-diagnosis-txt">Hypertension & Mild Fever</p>
+          </div>
+
+          <div class="medicines-block">
+            <strong>Rx (Prescribed Medicines):</strong>
+            <table class="pres-table">
+              <thead>
+                <tr>
+                  <th>Medicine Name</th>
+                  <th>Dosage</th>
+                  <th>Timing</th>
+                  <th>Duration</th>
+                </tr>
+              </thead>
+              <tbody id="presModalMedicinesTable">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+
+          <div class="instructions-block">
+            <strong>Special Instructions / Life Advice:</strong>
+            <p id="presModalInstructions">Take low salt, exercise daily.</p>
+          </div>
+        </div>
+
+        <div class="pres-footer">
+          <div class="qr-block">
+            <!-- Dynamic QR Code -->
+            <div class="mock-qr"
+              style="background: white; border: 1.5px solid var(--border-color); padding: 8px; border-radius: var(--radius-sm); width: max-content; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 4px;">
+              <img id="presModalQrImage" src="" alt="Verification QR Code"
+                style="width: 110px; height: 110px; display: block;">
+              <span
+                style="font-size: 8px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">SECURE
+                SCAN QR</span>
+            </div>
+            <small>Verify medicine authenticity at your local rural pharmacy.</small>
+          </div>
+          <div class="sign-block text-right">
+            <div id="presModalSignature" class="digital-sign">Dr. Anjali Menon (Digitally Signed)</div>
+            <p class="label-muted">Licensed Practitioner Stamp</p>
+          </div>
+        </div>
+      </div>
+      <div class="prescription-actions">
+        <!-- Audio Read Out Action -->
+        <button id="presSpeakBtn" class="btn btn-primary" onclick="readPrescriptionAloud()">
+          <i class="fa-solid fa-volume-high"></i> Listen to Prescription (Text-to-Speech)
+        </button>
+        <button class="btn btn-outline" onclick="window.print()">
+          <i class="fa-solid fa-print"></i> Save / Print
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- D. REAL-TIME CONSULTATION ROOM OVERLAY (Active Call Screen) -->
+  <div class="consultation-room-overlay" id="consultationRoom" style="display: none;">
+    <div class="room-container">
+
+      <!-- Video Screen grid -->
+      <div class="video-grid" id="videoGrid">
+        <!-- Remote view (big screen) -->
+        <div class="video-container remote-video-box">
+          <div id="remoteVideoPlaceholder" class="video-placeholder">
+            <i class="fa-solid fa-user-doctor placeholder-avatar"></i>
+            <p id="remoteVideoLabel">Connecting connection channel...</p>
+          </div>
+          <!-- Real stream or looping mock canvas will go here -->
+          <video id="remoteVideo" autoplay playsinline style="display: none;"></video>
+          <div class="stream-label" id="remoteStreamLabel">Remote Peer</div>
+        </div>
+
+        <!-- Local view (picture in picture) -->
+        <div class="video-container local-video-box">
+          <div id="localVideoPlaceholder" class="video-placeholder">
+            <i class="fa-solid fa-user placeholder-avatar"></i>
+            <p>You</p>
+          </div>
+          <video id="localVideo" autoplay playsinline muted style="display: none;"></video>
+          <div class="stream-label">Local Camera</div>
+        </div>
+      </div>
+
+      <!-- Left sidebar: Controls + Digital Prescription Panel (if Doctor) / View Prescription (if Patient) -->
+      <div class="room-side-control">
+        <div class="room-info-card">
+          <h3 id="roomTitle">Active Session</h3>
+          <p id="roomDocPatientInfo">Doctor Anjali & Patient Ramesh</p>
+          <div class="bandwidth-banner" id="roomBandwidthStatus">
+            <i class="fa-solid fa-gauge-simple-high"></i> Active: Standard Mode (Video + Audio)
+          </div>
+        </div>
+
+        <!-- Chat Frame inside Room -->
+        <div class="consultation-chat-panel">
+          <div class="chat-header">
+            <h4><i class="fa-solid fa-comments"></i> Patient Chat</h4>
+            <span class="chat-status" id="partnerChatStatus">Online</span>
+          </div>
+          <div class="chat-messages" id="chatMessagesBox">
+            <!-- Messages render here -->
+          </div>
+          <form id="chatForm" class="chat-input-area">
+            <input type="text" id="chatMessageInput" placeholder="Type message to doctor/patient..." required
+              autocomplete="off">
+
+            <label for="chatFileAttachment" class="chat-file-btn" title="Upload lab files">
+              <i class="fa-solid fa-paperclip"></i>
+              <input type="file" id="chatFileAttachment" accept="image/*,application/pdf" style="display: none;">
+            </label>
+
+            <button type="submit" class="chat-send-btn"><i class="fa-solid fa-paper-plane"></i></button>
+          </form>
+          <div id="chatFileNameIndicator" class="attachment-indicator" style="display: none;">
+            <span id="attachedFileName">file.pdf</span>
+            <button type="button" onclick="clearChatAttachment()"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+        </div>
+
+        <!-- Active Room Controls -->
+        <div class="call-controls">
+          <button id="btnToggleCamera" class="control-btn" title="Toggle Video"><i
+              class="fa-solid fa-video"></i></button>
+          <button id="btnToggleMic" class="control-btn" title="Toggle Mic"><i
+              class="fa-solid fa-microphone"></i></button>
+          <button id="btnToggleRoomBandwidth" class="control-btn control-btn-yellow" title="Toggle Bandwidth Mode"><i
+              class="fa-solid fa-gauge"></i> Low-BW</button>
+          <button id="btnEndCall" class="control-btn control-btn-red" title="End Consultation"><i
+              class="fa-solid fa-phone-slash"></i> End</button>
+        </div>
+      </div>
+
+      <!-- Doctor Interactive E-Prescription Writer Widget -->
+      <div class="doctor-prescription-writer-panel" id="doctorPrescriptionWriter" style="display: none;">
+        <h3><i class="fa-solid fa-pen-nib"></i> Write Digital Prescription</h3>
+        <p class="panel-subtitle">Draft prescription in real-time during this consultation.</p>
+
+        <form id="activeRoomPrescriptionForm">
+          <div class="input-group input-sm-grp">
+            <label>Diagnosis Summary</label>
+            <input type="text" id="writerDiagnosis" placeholder="e.g. Chronic Asthma, Stomach Infection" required>
+          </div>
+
+          <div class="medicines-writer-box">
+            <label>Medications Table</label>
+            <div id="writerMedicinesRows">
+              <!-- Default row -->
+              <div class="med-row">
+                <input type="text" class="med-name" placeholder="Drug Name (e.g. Paracetamol)" required>
+                <input type="text" class="med-dosage" placeholder="Dosage (e.g. 500mg, 1 tab)" required>
+                <input type="text" class="med-timing" placeholder="Timing (e.g. 1-0-1 After Food)" required>
+                <input type="text" class="med-duration" placeholder="Duration (e.g. 5 days)" required>
+                <button type="button" class="remove-med-row" onclick="removeMedicineRow(this)"><i
+                    class="fa-solid fa-trash-can"></i></button>
+              </div>
+            </div>
+            <button type="button" class="btn btn-outline btn-xs" onclick="addMedicineRow()"><i
+                class="fa-solid fa-plus"></i> Add Another Medicine</button>
+          </div>
+
+          <div class="input-group input-sm-grp" style="margin-top: 10px;">
+            <label>Doctor's Special Instructions</label>
+            <textarea id="writerInstructions" rows="2"
+              placeholder="Diet guidelines, warning triggers, follow-up times..."></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-teal btn-block"><i class="fa-solid fa-signature"></i> Authorize & Sign
+            Rx</button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Socket.IO library from Node server -->
+  <script src="/socket.io/socket.io.js"></script>
+  <!-- Socket connection layer -->
+  <script src="/public/js/socket.js"></script>
+  <!-- WebRTC setup layer -->
+  <script src="/public/js/webrtc.js"></script>
+  <!-- Main app script -->
+  <script src="/public/js/app.js"></script>
+</body>
+
+</html>
